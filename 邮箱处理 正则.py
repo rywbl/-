@@ -1,5 +1,6 @@
 import os
 import os.path
+import re
 def test(allStr):
 	LenallStr = len(allStr) -1
 	for i in range(LenallStr):
@@ -17,16 +18,24 @@ def work(path):
 		lineInfo = f.readline()
 		#曹阳,32010619720506042x,F,19720506,-,210005,13770848687,025-842019149,-,cy_qing@163.com,0
 		lineword = lineInfo.split(",")
-		Lenlineword = len(lineword)
-		for t in range(Lenlineword):
-			r = lineword[t].find("@")
-			if r != -1:
-				mailStr = lineword[t]
-		nameStr = lineInfo.split(",")[0]
-		if len(nameStr) == 0:
+		name_pattern = r"(\w+),"
+		nameStr = re.findall(name_pattern,lineInfo)
+		if len(nameStr) == 0 :
 			break
+		print(nameStr[0])
+		#nameStr = lineInfo.split(",")[0]
 		#获取邮箱的字符串 cy_qing@163.com
-		dirStrTemp = mailStr.split("@")[1].split(".")[0]
+		#
+		email_pattern = r".*,(.*@.*),"
+		mailStr = re.findall(email_pattern,lineInfo)
+		if len(mailStr) == 0:
+			continue
+		print(mailStr[0])
+		print(type(mailStr[0]))
+		
+		dirStrTemp1 = mailStr[0].split("@")
+		dirStrTemp = dirStrTemp1[1].split(".")[0]
+
 		#获取邮箱类型 126/qq/other   163
 		dirStr = os.path.join(resPath,dirStrTemp)
 		#获取邮箱类型对应的字符串  D:\python-project\result\163
@@ -42,11 +51,10 @@ def work(path):
 		filePath = os.path.join(dirStr,fileType + ".txt")
 		with open(filePath,"a") as fw:
 			lineno = str(lineNo)
-			fw.write(lineno + "  " + mailStr + "\n",)
+			fw.write(lineno + "  " + mailStr[0] + "\n",)
 			
 		print(lineNo)
 		lineNo += 1
-		
 
 		
 def getAllDirRE(path, sp = ""):
